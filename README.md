@@ -1,4 +1,8 @@
 
+[![Build Status](https://travis-ci.org/matmar10/express-json-patch-assertion.svg?branch=master)](https://travis-ci.org/matmar10/express-json-patch-assertion)
+
+
+
 # express-json-patch-assertion
 
 Assertion framework for JSON patch (RFC-6901) with connect style middleware

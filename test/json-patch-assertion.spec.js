@@ -4,6 +4,7 @@
 /* jshint expr:true */
 
 var expect = require('chai').expect;
+var errors = require('common-errors');
 
 describe('jsonPatchAssertion', function() {
 
@@ -52,14 +53,35 @@ describe('jsonPatchAssertion', function() {
     });
   });
 
+  describe('options validation', function () {
+
+    describe('validates `property`', function () {
+      it('rejects invalid `property` option', function () {
+        expect(function () {
+          jsonPatchAssertion({
+            property: false
+          });
+        }).to.throw(errors.ValidationError);
+        expect(function () {
+          jsonPatchAssertion({
+            property: 1
+          });
+        }).to.throw(errors.ValidationError);
+        expect(function () {
+          jsonPatchAssertion({
+            property: 'user'
+          });
+        }).to.not.throw(errors.ValidationError);
+      });
+    });
+  });
+
   describe('patch validation', function () {
 
     describe('`property` option default', function () {
       it('accepts a valid patch', function (done) {
-        jsonPatchAssertion({
-          property: 'userEdits'
-        })({
-          userEdits: [
+        jsonPatchAssertion()({
+          body: [
             { op: 'replace', path: '/names/first', value: 'Matthew' },
             { op: 'add', path: '/names/middle', value: 'Joseph' },
             { op: 'add', path: '/names/last', value: 'Martin' },
@@ -76,12 +98,11 @@ describe('jsonPatchAssertion', function() {
             { 'foo': 'bar', 'a': false }
           ]
         }, {}, function (err) {
-          expect(err).to.be.an.instanceof(Array);
+          expect(err).to.be.an.instanceof(errors.ValidationError);
           done();
         });
       });
     });
-
 
     describe('`property` option', function () {
 
@@ -93,7 +114,7 @@ describe('jsonPatchAssertion', function() {
             { op: 'replace', path: '/names/first', value: 'Matthew' },
             { op: 'add', path: '/names/middle', value: 'Joseph' },
             { op: 'add', path: '/names/last', value: 'Martin' },
-            { op: 'remove', path: '/jobs/0' },
+            { op: 'remove', path: '/jobs/0' }
           ]
         }, {}, function (err) {
           expect(err).to.be.undefined;
@@ -107,13 +128,12 @@ describe('jsonPatchAssertion', function() {
         })({
           userEdits: {}
         }, {}, function (err) {
-          expect(err).to.be.an.instanceof(Array);
+          expect(err).to.be.an.instanceof(errors.ValidationError);
           done();
         });
       });
     });
 
   });
-
 
 });

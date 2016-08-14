@@ -8,8 +8,9 @@
   },
   "dependencies": {
     "ajv": "^4.4.0",
-    "traverse": "^0.6.6",
-    "merge": "^1.2.0"
+    "common-errors": "^1.0.0",
+    "merge": "^1.2.0",
+    "traverse": "^0.6.6"
   },
   "devDependencies": {
     "chai": "^3.5.0",
