@@ -1,0 +1,48 @@
+{
+  "name": "express-json-patch-assertion",
+  "version": "0.1.0",
+  "description": "Assertion framework for JSON patch (RFC-6901) with connect style middleware",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "ajv": "^4.4.0",
+    "traverse": "^0.6.6",
+    "merge": "^1.2.0"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "grunt": "^1.0.1",
+    "grunt-cli": "^1.2.0",
+    "grunt-contrib-jshint": "^1.0.0",
+    "grunt-jsbeautifier": "^0.2.13",
+    "grunt-jsonlint": "^1.1.0",
+    "grunt-mocha-test": "^0.12.7",
+    "mocha": "^3.0.2"
+  },
+  "scripts": {
+    "test": "mocha test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/matmar10/express-json-patch-assertion.git"
+  },
+  "keywords": [
+    "express",
+    "json",
+    "patch",
+    "rfc",
+    "6901",
+    "middleware",
+    "connect",
+    "validate",
+    "assertion"
+  ],
+  "author": "Matthew J. Martin <matthew.mar10@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/matmar10/express-json-patch-assertion/issues"
+  },
+  "homepage": "https://github.com/matmar10/express-json-patch-assertion"
+}

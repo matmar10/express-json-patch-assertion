@@ -1,3 +1,4 @@
+
 # express-json-patch-assertion
 
 Assertion framework for JSON patch (RFC-6901) with connect style middleware
@@ -64,4 +65,15 @@ app.patch('/user/:id', patchValidator({
 });
 
 ```
+
+## Usage
+
+### Assertion Object
+
+* **condition** _{function}_ Invoked with request and response context for you to check if some condition is true
+	* **req** _{object}_ The request object
+	* **res** _{object}_ The response object
+	* **next** _{function}_ Method that should be invoked in continuation-passing style with first argument as an error if something went wrong and second argument as a boolean indicating if the condition evaluated to _true_/_false_
+		* **err** _{object}_ An error, if one occurred or falsey if OK
+		* **result** _{boolean}_ A truthy value indicating if condition was true/false
 
