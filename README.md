@@ -15,16 +15,22 @@ Assertion framework for JSON patch (RFC-6901) with connect style middleware
 
 ## Logic
 
-* if - operation matches provided operation pattern(s)
-  * and - condition is true (if it exists)
-* then - run the assertion (if it exists)
-  * if - assertion is true
-  * then - allow operation to proceed
+* allow - operations **not** explicitly matched here will fail with an error; matched expression will fail if the assertion fails or assertion returns an error
+  * if - operation matches provided operation pattern(s)
+    * and - condition is true (if it exists)
+  * then - run the assertion (if it exists)
+    * if - assertion is true
+    * then - allow operation to proceed
+    * else - block the operation
+  * else - allow operation to proceed
+* deny - operations matched here will be blocked; non-matched operations are ignored
+  * if - operation matches provided operation pattern(s)
+    * and - condition is true (if it exists)
+  * then - run the assertion (if it exists)
+    * if - assertion is true
+    * then - allow the operation to proceed
+    * else - block the operation
   * else - block the operation
-* else - allow operation to proceed
-
-* whitelist - any operations **not** explicitly matched here will fail with an error
-* blacklist - any operations matched here will fail with an error; non-matched operations are ignored
 
 ## Example
 
@@ -36,7 +42,7 @@ var patchValidator = require('express-json-patch-assertion');
 ### Example
 
 app.patch('/user/:id', patchValidator({
-  whitelist: [
+  allow: [
     {
       condition: function (req, res, next) {
         return req.user.isAdmin;
@@ -64,7 +70,7 @@ app.patch('/user/:id', patchValidator({
       }
     }
   ],
-  blacklist: [
+  deny: [
     {
       condition: function (req, res, next) {
         if (!req.user) {
@@ -83,14 +89,30 @@ app.patch('/user/:id', patchValidator({
 
 ```
 
-## Usage
+## API
+
+### Option
+
+* **property** _{string}_ [default: `body`] (optional) Request property to retrieve the patch array from
+* **allow** _{array|object}_ [default: `[]` ] (optional) Single or list of assertion objects (see: Assertion Object) that should allow the matched operations to proceed; unmatched operations will cause an error
+* **deny** _{array|object}_ [default: `[]` ] (optional) Single or list of assertion objects (see: Assertion Object) that should cause the matched operations to be blocked; unmatched operations will be allowed to proceed
 
 ### Assertion Object
 
-* **condition** _{function}_ Invoked with request and response context for you to check if some condition is true
+* **path** _{string|array}_ [default: `*`] (optional) Expression to match against the `path` property of the patch array. _*_ indicates wildcard and will match all paths. Paths like `/addresses/*` are not yet supported (coming soon).
+* **op** _{string|array}_ [default: `*`] (optional) Operations or array of operations to match against the `op` property of the patch array; must be one of the valid patch operations: _add_, _replace_, _move_, _copy_, _test_ or _*_ to indicate a wildcard that will match any operation.
+* **value** _{mixed|RegExp}_ [default: `*`] (optional) Value to match against the `value` property of the patch. This can be any value, a javascript regular expression, or a wildcard _*_
+* **assertion** _{function}_ [default: `false`] (optional) Provide a callback to check if some business logic condition(s) is true. You are provided with the matched operation, the request, and response context as arguments:
+	* **operation** _{object}_ The operation that was matched
 	* **req** _{object}_ The request object
 	* **res** _{object}_ The response object
-	* **next** _{function}_ Method that should be invoked in continuation-passing style with first argument as an error if something went wrong and second argument as a boolean indicating if the condition evaluated to _true_/_false_
+	* **next** _{function}_ Callback that should be invoked in continuation-passing style with first argument as an error if something went wrong and second argument as a boolean indicating if the condition evaluated to _true_/_false_
 		* **err** _{object}_ An error, if one occurred or falsey if OK
 		* **result** _{boolean}_ A truthy value indicating if condition was true/false
-
+* **condition** _{function}_ NOT YET IMPLEMENTED - Invoked with request and response context for you to check if some condition is true
+	* **req** _{object}_ The request object
+	* **res** _{object}_ The response object
+	* **next** _{function}_ Callback that should be invoked in continuation-passing style with first argument as an error if something went wrong and second argument as a boolean indicating if the condition evaluated to _true_/_false_
+		* **err** _{object}_ An error, if one occurred or falsey if OK
+		* **result** _{boolean}_ A truthy value indicating if condition was true/false
+* **next** _{boolean}_ [default: `true`] (optional) Whether to continue matching if this assertion was matched. For example, check up front if the user has super admin and stop matching further assertions if so
