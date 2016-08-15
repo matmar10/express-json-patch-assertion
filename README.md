@@ -44,6 +44,7 @@ var patchValidator = require('express-json-patch-assertion');
 app.patch('/user/:id', patchValidator({
   allow: [
     {
+      message: 'Admins can perform any operation on any path',
       condition: function (req, res, next) {
         return req.user.isAdmin;
       },
@@ -52,14 +53,17 @@ app.patch('/user/:id', patchValidator({
       next: false
     },
     {
+      message: 'User info may be added but not removed',
       path: [ 'firstName', 'lastName', 'age' ]
       op: [ 'add' ]
     },
     {
+      message: 'Favorite food may be modified',
       path: '/favoriteFood',
       op: '*'
     },
     {
+      message: 'Date of birth may not be deleted nor set to a date that is too far in the past',
       path: '/dob',
       op: [ 'add', 'replace' ],
       assertion: function (operation, req, res, next) {
@@ -72,6 +76,7 @@ app.patch('/user/:id', patchValidator({
   ],
   deny: [
     {
+      message: 'Payout settings may not be edited except by admin',
       condition: function (req, res, next) {
         if (!req.user) {
           next(new Error('Something wrong: no user present!'));
@@ -93,16 +98,17 @@ app.patch('/user/:id', patchValidator({
 
 ### Option
 
-* **property** _{string}_ [default: `body`] (optional) Request property to retrieve the patch array from
-* **allow** _{array|object}_ [default: `[]` ] (optional) Single or list of assertion objects (see: Assertion Object) that should allow the matched operations to proceed; unmatched operations will cause an error
-* **deny** _{array|object}_ [default: `[]` ] (optional) Single or list of assertion objects (see: Assertion Object) that should cause the matched operations to be blocked; unmatched operations will be allowed to proceed
+* **property** _{string}_ [default: `body`] (optional) - Request property to retrieve the patch array from
+* **allow** _{array|object}_ [default: `[]` ] (optional) - Single or list of assertion objects (see: Assertion Object) that should allow the matched operations to proceed; unmatched operations will cause an error
+* **deny** _{array|object}_ [default: `[]` ] (optional) - Single or list of assertion objects (see: Assertion Object) that should cause the matched operations to be blocked; unmatched operations will be allowed to proceed
 
 ### Assertion Object
 
-* **path** _{string|array}_ [default: `*`] (optional) Expression to match against the `path` property of the patch array. _*_ indicates wildcard and will match all paths. Paths like `/addresses/*` are not yet supported (coming soon).
-* **op** _{string|array}_ [default: `*`] (optional) Operations or array of operations to match against the `op` property of the patch array; must be one of the valid patch operations: _add_, _replace_, _move_, _copy_, _test_ or _*_ to indicate a wildcard that will match any operation.
-* **value** _{mixed|RegExp}_ [default: `*`] (optional) Value to match against the `value` property of the patch. This can be any value, a javascript regular expression, or a wildcard _*_
-* **assertion** _{function}_ [default: `false`] (optional) Provide a callback to check if some business logic condition(s) is true. You are provided with the matched operation, the request, and response context as arguments:
+* **message** _{string}_ [default: `Invalid patch: matched operation assertion failed`] (optional) - Error message to contextualize what went wrong. Helpful for understanding the business case behind the assertion
+* **path** _{string|array}_ [default: `*`] (optional) - Expression to match against the `path` property of the patch array. _*_ indicates wildcard and will match all paths. Paths like `/addresses/*` are not yet supported (coming soon).
+* **op** _{string|array}_ [default: `*`] (optional) - Operations or array of operations to match against the `op` property of the patch array; must be one of the valid patch operations: _add_, _replace_, _move_, _copy_, _test_ or _*_ to indicate a wildcard that will match any operation.
+* **value** _{mixed|RegExp}_ [default: `*`] (optional) - Value to match against the `value` property of the patch. This can be any value, a javascript regular expression, or a wildcard _*_
+* **assertion** _{function}_ [default: `false`] (optional) - Provide a callback to check if some business logic condition(s) is true. You are provided with the matched operation, the request, and response context as arguments:
 	* **operation** _{object}_ The operation that was matched
 	* **req** _{object}_ The request object
 	* **res** _{object}_ The response object
