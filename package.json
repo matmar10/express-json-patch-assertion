@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "ajv": "^4.4.0",
+    "bluebird": "^3.4.1",
     "common-errors": "^1.0.0",
     "merge": "^1.2.0",
     "traverse": "^0.6.6"

@@ -13,6 +13,19 @@ Assertion framework for JSON patch (RFC-6901) with connect style middleware
 * Allow/deny patches based on conditions
 * Doing this procedurally is a PITA
 
+## Logic
+
+* if - operation matches provided operation pattern(s)
+  * and - condition is true (if it exists)
+* then - run the assertion (if it exists)
+  * if - assertion is true
+  * then - allow operation to proceed
+  * else - block the operation
+* else - allow operation to proceed
+
+* whitelist - any operations **not** explicitly matched here will fail with an error
+* blacklist - any operations matched here will fail with an error; non-matched operations are ignored
+
 ## Example
 
 ```
@@ -43,7 +56,7 @@ app.patch('/user/:id', patchValidator({
     {
       path: '/dob',
       op: [ 'add', 'replace' ],
-      assertion: function (dob, req, res, next) {
+      assertion: function (operation, req, res, next) {
         if (moment(dob).isBefore(dobOfOldestPersonInWorld, 'day')) {
           next(new Error('You are unrealistically old!'));
         }

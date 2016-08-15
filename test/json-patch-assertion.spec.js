@@ -76,7 +76,7 @@ describe('jsonPatchAssertion', function() {
     });
   });
 
-  describe('patch validation', function () {
+  describe('patch schema validation', function () {
 
     describe('`property` option default', function () {
       it('accepts a valid patch', function (done) {
@@ -136,4 +136,41 @@ describe('jsonPatchAssertion', function() {
 
   });
 
+
+  describe('whitelist', function () {
+    it('runs provided assertion on matched operations', function (done) {
+
+      var assertions = [
+        {
+          // this should fail
+          op: 'add', path: '/names/last', assertion: function (operation, req, res, next) {
+            next(null, operation.value === 'Smith');
+          }
+        },
+        {
+          // this should pass
+          op: 'add', path: '/names/middle', assertion: function (operation, req, res, next) {
+            next(null, operation.value === 'Joseph');
+          }
+        }
+      ];
+
+      var operations = [
+        { op: 'add', path: '/names/middle', value: 'Joseph' },
+        { op: 'add', path: '/names/last', value: 'Martin' }
+      ];
+
+      jsonPatchAssertion({
+        allow: assertions
+      })({
+        body: operations
+      }, {}, function (err) {
+        expect(err).to.be.an.instanceof(errors.ValidationError);
+        expect(err.operation).to.equal(operations[1]);
+        expect(err.assertion).to.equal(assertions[0]);
+        done();
+      });
+
+    });
+  });
 });

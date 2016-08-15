@@ -1,8 +1,8 @@
 {
-	"title": "JSON schema for express-json-patch-assertion options",
-	"$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "JSON schema for express-json-patch-assertion options",
+  "$schema": "http://json-schema.org/draft-04/schema#",
 
-	"type": "object",
+  "type": "object",
   "properties": {
     "allow": {
       "description": "Assertions that will allow matched operations to proceed",
@@ -27,8 +27,7 @@
     }
   },
   "required": ["allow", "deny", "property", "ajv"],
-  "additionalProperties": false,
-	"definitions": {
+  "definitions": {
     "assertion": {
       "type": "object",
       "allOf": [
@@ -40,10 +39,18 @@
           "type": "object"
         },
         "assertion": {
-          "type": "object"
+          "description": "Whether to proceed to next middleware if this one is matched"
         },
         "next": {
+          "description": "Whether to proceed to next middleware if this one is matched",
           "type": "boolean"
+        },
+        "value": {
+          "description": "Value or pattern to match against this operation"
+        },
+        "from": {
+          "description": "Property to copy or move from",
+          "type": "string"
         }
       },
       "required": [ "path", "op" ]
@@ -55,16 +62,16 @@
       }
     },
 
-		"path": {
-			"properties": {
-				"path": {
+    "path": {
+      "properties": {
+        "path": {
           "oneOf": [
             { "$ref": "#/definitions/pathString" },
             { "$ref": "#/definitions/pathList" }
           ]
-				}
-			}
-		},
+        }
+      }
+    },
     "pathString": {
       "description": "A JSON Pointer path.",
       "type": "string"
